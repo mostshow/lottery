@@ -1,0 +1,5 @@
+.lottery{width: 100%; max-width: 750px; margin:0px auto;}
+.lottery ul{overflow: hidden;}
+.lottery ul li {text-align:center;line-height:100px;border:1px solid blue;background-color:yellow; width:33%;height:100px;float:left;}
+.lottery ul li.active{background: red;}
+.lottery ul li.ok{}

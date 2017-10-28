@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>lottery</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="apple-mobile-web-app-capable" content="yes" /><!-- 删除苹果默认的工具栏和菜单栏 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" /><!-- 设置苹果工具栏颜色 -->
+    <meta name="format-detection" content="telephone=no, email=no" />
+	<link rel="stylesheet" type="text/css" href="./css/index.css">
+	<link rel="stylesheet" type="text/css" href="./css/reset.css">
+    <script type="text/javascript" src="./js/zepto.js"></script>
+    <script type="text/javascript">
+	/*
+	    控制html的fontsize函数
+	*/
+	;(function (win, doc) {
+	// var max = 414;
+	// var setFontSize = function () {
+	//     var myHTML = doc.querySelector("html");
+	//     var myWidth = doc.documentElement.clientWidth > max ? max : doc.documentElement.clientWidth;
+
+	//     myHTML.style.fontSize = 100 * myWidth / max  + 'px';
+	// };
+	// win.onresize = function () {
+	//     setFontSize();
+	// };
+	// setFontSize();
+	var designWidth = 750, calcBase = 100, minWidth = 320, myDeviceWidth = null, myFontSize = null;
+	function calculateFontSize()
+	{
+	    if (win.innerWidth < win.innerHeight) {
+	        myDeviceWidth = win.innerWidth;
+	    }
+	    else {
+	        myDeviceWidth = win.innerHeight;
+	    }
+	    if (myDeviceWidth >= designWidth) {
+	        myDeviceWidth = designWidth;
+	    }
+	    else if (myDeviceWidth <= minWidth) {
+	        myDeviceWidth = minWidth;
+	    }
+	    else {
+	        myDeviceWidth = myDeviceWidth;
+	    }
+		myFontSize = myDeviceWidth * calcBase  / designWidth;
+		doc.querySelector('html').style.fontSize = myFontSize + 'px'; 
+	}
+	win.onresize = function ()
+	{
+	    calculateFontSize()
+	};
+	calculateFontSize();
+
+	})(window, document);
+</script>
+
+</head>
+<body>
+    <section class="lottery">
+    	<ul>
+    		<li class="lottery-unit" data-index="0" >1</li>
+    		<li class="lottery-unit" data-index="1" >2</li>
+    		<li class="lottery-unit" data-index="2" >3</li>
+    		<li class="lottery-unit" data-index="7" >4</li>
+    		<li class="gogogo" data-num="1">go!</li>
+    		<li class="lottery-unit" data-index="3" >6</li>
+    		<li class="lottery-unit" data-index="6" >7</li>
+    		<li class="lottery-unit" data-index="5" >8</li>
+    		<li class="lottery-unit" data-index="4" >9</li>
+    	</ul>
+    </section>
+<script type="text/javascript" src="./js/lottery.js"></script>
+</body>
+</html>
