@@ -1,5 +1,6 @@
 
 
+var $ = require("zepto");
 
 function Lottery(){
     this._initialize.apply(this, arguments);
@@ -7,9 +8,31 @@ function Lottery(){
 
 Lottery.prototype = {
 
-    _initialize: function(){
+    _initialize: function(options){
 
-        this._setOptions();
+        var _ctx = this;
+
+        this._setOptions(options);
+
+        _ctx.lotteryUnit = $(_ctx.lotteryUnit);
+        _ctx.count = _ctx.lotteryUnit.length;
+        _ctx.lock = false;
+        //_ctx.selectNum = _ctx.count;
+        _ctx.speed = _ctx.cycleTime/_ctx.cycleNum;
+        _ctx.arrLotteryUnitTemp = [];
+        _ctx.arrLotteryUnit = [];
+        $.each(_ctx.lotteryUnit, function(key, node){
+            var $node = $(node);
+            _ctx.arrLotteryUnitTemp[$node.data(_ctx.nodeKey)] = $node;
+
+        })
+        $.each(_ctx.arrLotteryUnitTemp, function(key, node){
+            if(!node) return;
+            _ctx.arrLotteryUnit.push(node)
+        })
+        _ctx.firstNodeIndex = this.arrLotteryUnit[0].data(this.nodeKey);
+        _ctx.lastNodeIndex = this.arrLotteryUnit[this.count - 1].data(this.nodeKey);
+        _ctx.select();
     },
 
     _setOptions: function(options){
@@ -24,29 +47,14 @@ Lottery.prototype = {
             cycleTime:2000,
             selectNum: 5,
             currentCycleNum:0,
-            cycleNum:100,
+            cycleNum:1000,
             fastSpeed:50,
             accSpeed:20,
             accEndSpeed:100
         },
         _ctx = this;
-
-        _ctx.lotteryUnit = $(defaultOptions.lotteryUnit);
-        _ctx.count = _ctx.lotteryUnit.length;
-        //_ctx.selectNum = _ctx.count;
-        _ctx.speed = defaultOptions.cycleTime/_ctx.cycleNum;
-        _ctx.arrLotteryUnitTemp = [];
-        _ctx.arrLotteryUnit = [];
-        $.each(_ctx.lotteryUnit, function(key, node){
-            var $node = $(node);
-            _ctx.arrLotteryUnitTemp[$node.data(defaultOptions.nodeKey)] = $node;
-
-        })
-        $.each(_ctx.arrLotteryUnitTemp, function(key, node){
-            if(!node) return;
-            _ctx.arrLotteryUnit.push(node)
-        })
         $.extend(_ctx, defaultOptions, options || {});
+
     },
 
     _init: function(){
@@ -88,6 +96,7 @@ Lottery.prototype = {
             (this.prize && this.prizeIndex === -1)) {
             this.callback&&this.callback(this.arrLotteryUnit[this.arrLotteryUnitIndex]);
             this._init();
+            this.lock = false;
 
             return false;
         }else{
@@ -100,21 +109,21 @@ Lottery.prototype = {
         this.select();
 
         var timeDifference = new Date().getTime() - this.startTime,
-            firstNode = this.arrLotteryUnit[0],
-            nextNode = this.arrLotteryUnit[this.arrLotteryUnitIndex + 1] || firstNode,
-            lastNode = this.arrLotteryUnit[this.count - 1];
+            nextNode = this.arrLotteryUnit[this.arrLotteryUnitIndex + 1],
+            nextNodeIndex = nextNode ? nextNode.data(this.nodeKey): this.firstNodeIndex;
         ++this.currentCycleNum;
 
         if(this.isEnd(timeDifference)){
             if (this.currentCycleNum < this.cycleNum) {
 
                 this.speed -= this.accSpeed;
-                if(this.prize) this.currentCycleNum = this.cycleNum;
+                if(this.prize&&timeDifference > this.cycleTime) this.currentCycleNum = this.cycleNum;
 
             }else{
+
                 if (this.currentCycleNum > this.cycleNum + this.selectNum &&
-                 ((this.prizeIndex === firstNode.data(this.nodeKey) && this.currentIndex === lastNode.data(this.nodeKey) )||
-                  this.prizeIndex === nextNode.data(this.nodeKey) )) {
+                 ((this.prizeEqualFirstNode && this.currentIndex === this.lastNodeIndex )||
+                  this.prizeIndex === nextNodeIndex )) {
                     this.speed += this.accEndSpeed;
                 }else{
                     this.speed += this.accSpeed;
@@ -128,8 +137,15 @@ Lottery.prototype = {
     },
 
     start: function(){
-        this._init();
-        this.roll();
+        if(this.lock){
+            return;
+        }else{
+            this.lock = true;
+            this._init();
+            this.roll();
+            this.lock = true;
+        }
+
     },
     stop: function(prizeIndex,callback){
 
@@ -137,15 +153,10 @@ Lottery.prototype = {
         this.cycleNum = this.count * 3;
         this.prizeIndex = prizeIndex;
         this.callback = callback;
+        this.prizeEqualFirstNode = this.prizeIndex === this.firstNodeIndex ? true: false;
         return false;
     }
 
 };
 
-var Lottery = new Lottery();
-Lottery.start();
-setTimeout(function(){
-	Lottery.stop(7, function(index){
-
-	});
-},1000)
+module.exports = Lottery;
