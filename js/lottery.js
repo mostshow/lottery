@@ -40,6 +40,7 @@ Lottery.prototype = {
         var defaultOptions = {
             lotteryUnit:'.lottery .lottery-unit',
             nodeKey:'index',
+            typeKey:'prizetype',
             timer:null,
             prizeIndex:-1,
             arrLotteryUnitIndex: 0,
@@ -82,18 +83,18 @@ Lottery.prototype = {
 
     next: function(){
 
-        if(this.currentIndex  === -1 || ++this.arrLotteryUnitIndex >= this.count){
+        if(this.currentIndex  == -1 || ++this.arrLotteryUnitIndex >= this.count){
             this.arrLotteryUnitIndex = 0;
         }
-        this.currentIndex = this.arrLotteryUnit[this.arrLotteryUnitIndex].data(this.nodeKey);
+        this.currentIndex = this.arrLotteryUnit[this.arrLotteryUnitIndex].data(this.typeKey);
         return this.arrLotteryUnit[this.arrLotteryUnitIndex];
     },
 
     isEnd: function(timeDifference){
         if ((this.currentCycleNum > this.cycleNum + this.selectNum &&
             timeDifference > this.cycleTime &&
-            this.prizeIndex === this.currentIndex) ||
-            (this.prize && this.prizeIndex === -1)) {
+            this.prizeIndex == this.currentIndex) ||
+            (this.prize && this.prizeIndex == -1)) {
             this.callback&&this.callback(this.arrLotteryUnit[this.arrLotteryUnitIndex]);
             this._init();
             this.lock = false;
@@ -110,7 +111,7 @@ Lottery.prototype = {
 
         var timeDifference = new Date().getTime() - this.startTime,
             nextNode = this.arrLotteryUnit[this.arrLotteryUnitIndex + 1],
-            nextNodeIndex = nextNode ? nextNode.data(this.nodeKey): this.firstNodeIndex;
+            nextNodeIndex = nextNode ? nextNode.data(this.typeKey): this.firstNodeIndex;
         ++this.currentCycleNum;
 
         if(this.isEnd(timeDifference)){
@@ -122,8 +123,8 @@ Lottery.prototype = {
             }else{
 
                 if (this.currentCycleNum > this.cycleNum + this.selectNum &&
-                 ((this.prizeEqualFirstNode && this.currentIndex === this.lastNodeIndex )||
-                  this.prizeIndex === nextNodeIndex )) {
+                 ((this.prizeEqualFirstNode && this.currentIndex == this.lastNodeIndex )||
+                  this.prizeIndex == nextNodeIndex )) {
                     this.speed += this.accEndSpeed;
                 }else{
                     this.speed += this.accSpeed;
@@ -153,7 +154,7 @@ Lottery.prototype = {
         this.cycleNum = this.count * 3;
         this.prizeIndex = prizeIndex;
         this.callback = callback;
-        this.prizeEqualFirstNode = this.prizeIndex === this.firstNodeIndex ? true: false;
+        this.prizeEqualFirstNode = this.prizeIndex == this.firstNodeIndex ? true: false;
         return false;
     }
 
